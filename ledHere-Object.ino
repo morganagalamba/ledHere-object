@@ -110,11 +110,11 @@ void connectESP8266()
   //  3 - ESP8266_MODE_STAAP - Station/AP combo
   // Use esp8266.getMode() to check which mode it's in:
   int retVal = esp8266.getMode();
-  if (retVal != ESP8266_MODE_STAAP)
+  if (retVal != ESP8266_MODE_STA)
   { // If it's not in station mode.
     // Use esp8266.setMode([mode]) to set it to a specified
     // mode.
-    retVal = esp8266.setMode(ESP8266_MODE_STAAP);
+    retVal = esp8266.setMode(ESP8266_MODE_STA);
     if (retVal < 0)
     {
       Serial.println(F("Error setting mode."));
@@ -190,10 +190,13 @@ void serverDemo()
   
  if (client) {                             // if you get a client,
     Serial.println("new client");           // print a message out the serial port
-    String currentLine = "";                // make a String to hold incoming data from the client
+    //String currentLine = "";                // make a String to hold incoming data from the client
     while (client.connected()) {            // loop while the client's connected
-      if (client.available()) {             // if there's bytes to read from the client,
-        char c = client.read();             // read a byte, then
+      if (client.available()) {              // if there's bytes to read from the client,
+        String request = client.readStringUntil("HTTP");
+        Serial.println("leu aqui");
+        Serial.println(request);
+        /*char c = client.read();             // read a byte, then
         Serial.write(c);                    // print it out the serial monitor
         if (c == '\n') {                    // if the byte is a newline character
 
@@ -207,8 +210,8 @@ void serverDemo()
             client.println();
 
             // the content of the HTTP response follows the header:
-            client.print("Click <a href=\"/H\">here</a> turn the LED on pin 9 on<br>");
-            client.print("Click <a href=\"/L\">here</a> turn the LED on pin 9 off<br>");
+            client.print("Click <a href=\"/H\">here</a> turn the LED on pin 13 on<br>");
+            client.print("Click <a href=\"/L\">here</a> turn the LED on pin 13 off<br>");
 
             // The HTTP response ends with another blank line:
             client.println();
@@ -219,14 +222,14 @@ void serverDemo()
           }
         } else if (c != '\r') {  // if you got anything else but a carriage return character,
           currentLine += c;      // add it to the end of the currentLine
-        }
-        Serial.println(currentLine);
+        }*/
+        //Serial.println(currentLine);
         // Check to see if the client request was "GET /H" or "GET /L":
-        if (currentLine.endsWith("GET /H")) {
+        if (request.indexOf("GET /H") >= 0) {
           digitalWrite(13, HIGH); // GET /H turns the LED on
           Serial.println("ledON");
         }
-        if (currentLine.endsWith("GET /L")) {
+        if (request.indexOf("GET /L") >= 0) {
           
           digitalWrite(13, LOW);                // GET /L turns the LED off
           Serial.println("ledOFF");
