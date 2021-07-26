@@ -23,6 +23,7 @@ Distributed as-is; no warranty is given.
 // using it).
 #include <SoftwareSerial.h> 
 #include <SparkFunESP8266WiFi.h>
+#include <ArduinoJson.h>
 
 //////////////////////////////
 // WiFi Network Definitions //
@@ -53,7 +54,7 @@ const String htmlHeader = "HTTP/1.1 200 OK\r\n"
 const String httpRequest = "GET / HTTP/1.1\n"
                            "Host: example.com\n"
                            "Connection: close\n\n";
-
+String json = "";
 // All functions called from setup() are defined below the
 // loop() function. They modularized to make it easier to
 // copy/paste into sketches of your own.
@@ -188,42 +189,33 @@ void serverDemo()
   // checking for a connection.
   ESP8266Client client = server.available(500);
   
- if (client) {                             // if you get a client,
+ if (client) {
+  // if you get a client,
+    
+   
+    
     Serial.println("new client");           // print a message out the serial port
-    //String currentLine = "";                // make a String to hold incoming data from the client
     while (client.connected()) {            // loop while the client's connected
       if (client.available()) {              // if there's bytes to read from the client,
         String request = client.readStringUntil("HTTP");
         Serial.println("leu aqui");
         Serial.println(request);
-        /*char c = client.read();             // read a byte, then
-        Serial.write(c);                    // print it out the serial monitor
-        if (c == '\n') {                    // if the byte is a newline character
+        
+        
+      int aux1 = request.indexOf('{');
+      int aux2 = request.indexOf('}');
+      json = request.substring(aux1,aux2+1);
+      Serial.println(json);
 
-          // if the current line is blank, you got two newline characters in a row.
-          // that's the end of the client HTTP request, so send a response:
-          if (currentLine.length() == 0) {
-            // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
-            // and a content-type so the client knows what's coming, then a blank line:
-            client.println("HTTP/1.1 200 OK");
-            client.println("Content-type:text/html");
-            client.println();
-
-            // the content of the HTTP response follows the header:
-            client.print("Click <a href=\"/H\">here</a> turn the LED on pin 13 on<br>");
-            client.print("Click <a href=\"/L\">here</a> turn the LED on pin 13 off<br>");
-
-            // The HTTP response ends with another blank line:
-            client.println();
-            // break out of the while loop:
-            break;
-          } else {    // if you got a newline, then clear currentLine:
-            currentLine = "";
-          }
-        } else if (c != '\r') {  // if you got anything else but a carriage return character,
-          currentLine += c;      // add it to the end of the currentLine
-        }*/
-        //Serial.println(currentLine);
+     
+      //Serial.println("{\"sensor\":\"gps\",\"time\":1351824120,\"data\":[48.756080,2.302038]}");
+       //DeserializationError error = deserializeJson(doc, json1);
+      //{"ColorSetup":[[0,0,255],[255,0,0]],"Effect":324}
+    /*
+      JsonObject obj = doc.as<JsonObject>();
+      long effect = obj["Effect"];
+      Serial.println(effect);
+    */
         // Check to see if the client request was "GET /H" or "GET /L":
         if (request.indexOf("GET /H") >= 0) {
           digitalWrite(13, HIGH); // GET /H turns the LED on
@@ -236,6 +228,19 @@ void serverDemo()
         }
       }
     }
+    for(int i=0;i < json.length() ;i++){
+      Serial.println(json[i]);
+      if(json[i] == '}'){
+        Serial.println("entrou aqui121212");
+        StaticJsonDocument<200> doc;
+          delay(2000);
+      deserializeJson(doc, json);
+      JsonObject obj = doc.as<JsonObject>();
+      long effect = obj["Effect"];
+      Serial.println(effect);
+      }
+    }
+    //deserelize();
     // close the connection:
     client.stop();
     Serial.println("client disonnected");
