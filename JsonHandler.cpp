@@ -1,4 +1,4 @@
-void setup() {
+/*void setup() {
   // put your setup code here, to run once:
 
 
@@ -17,7 +17,7 @@ void setup() {
         if(array[i]!='[' && array[i]!=']' && array[i]!=','){
             colors[x][y] = colors[x][y] + array[i];
         }
-        if(array[i] == ','){
+        if(array[i] == ','){a
             y=y+1;
         }
         if(i>0 & array[i]=='['){
@@ -52,4 +52,4 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 
-}
+}*/

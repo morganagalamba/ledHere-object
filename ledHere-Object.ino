@@ -1,49 +1,30 @@
 
-/************************************************************
-ESP8266_Shield_Demo.h
-SparkFun ESP8266 AT library - Demo
-Jim Lindblom @ SparkFun Electronics
-Original Creation Date: July 16, 2015
-https://github.com/sparkfun/SparkFun_ESP8266_AT_Arduino_Library
-This example demonstrates the basics of the SparkFun ESP8266
-AT library. It'll show you how to connect to a WiFi network,
-get an IP address, connect over TCP to a server (as a client),
-and set up a TCP server of our own.
-Development environment specifics:
-  IDE: Arduino 1.6.5
-  Hardware Platform: Arduino Uno
-  ESP8266 WiFi Shield Version: 1.0
-This code is released under the MIT license.
-Distributed as-is; no warranty is given.
-************************************************************/
-//////////////////////
-// Library Includes //
-//////////////////////
-// SoftwareSerial is required (even you don't intend on
-// using it).
 #include <SoftwareSerial.h> 
 #include <SparkFunESP8266WiFi.h>
 #include <ArduinoJson.h>
 
-//////////////////////////////
-// WiFi Network Definitions //
-//////////////////////////////
-// Replace these two character strings with the name and
-// password of your WiFi network.
+const int azul1 = 13;
+const int verde1 = 12;
+const int vermelho1 = 11;
+
+
+const int azul2 = A0;
+const int verde2 = A1;
+const int vermelho2 = A2;
+
+const int azul3 = 7;
+const int verde3 = 6;
+const int vermelho3 = 5;
+
+const int azul4 = 4;
+const int verde4 = 3;
+const int vermelho4 = 2;
+
 const char mySSID[] = "L&A Produções Artisticas2";
 const char myPSK[] = "Le@0402Cultur@";
 
-//////////////////////////////
-// ESP8266Server definition //
-//////////////////////////////
-// server object used towards the end of the demo.
-// (This is only global because it's called in both setup()
-// and loop()).
 ESP8266Server server = ESP8266Server(80);
 
-//////////////////
-// HTTP Strings //
-//////////////////
 const char destServer[] = "example.com";
 const String htmlHeader = "HTTP/1.1 200 OK\r\n"
                           "Content-Type: text/html\r\n"
@@ -54,13 +35,25 @@ const String htmlHeader = "HTTP/1.1 200 OK\r\n"
 const String httpRequest = "GET / HTTP/1.1\n"
                            "Host: example.com\n"
                            "Connection: close\n\n";
-String json = "";
-// All functions called from setup() are defined below the
-// loop() function. They modularized to make it easier to
-// copy/paste into sketches of your own.
+
+String colors[4][3];
+String effect = "";
+String token = "";
+
 void setup() 
 {
- 
+   pinMode(azul1, OUTPUT);
+   pinMode(verde1, OUTPUT);
+   pinMode(vermelho1, OUTPUT);
+   pinMode(azul2, OUTPUT);
+   pinMode(verde2, OUTPUT);
+   pinMode(vermelho2, OUTPUT);
+   pinMode(azul3, OUTPUT);
+   pinMode(verde3, OUTPUT);
+   pinMode(vermelho3, OUTPUT);
+   pinMode(azul4, OUTPUT);
+   pinMode(verde4, OUTPUT);
+   pinMode(vermelho4, OUTPUT);
   // Serial Monitor is used to control the demo and view
   // debug information.
   Serial.begin(9600);
@@ -85,6 +78,18 @@ void setup()
 void loop() 
 {
   serverDemo();
+  analogWrite(azul1,colors[0][0].toInt());
+  analogWrite(verde1,colors[0][1].toInt());
+  analogWrite(vermelho1, colors[0][2].toInt()); 
+ analogWrite(azul2, colors[1][0].toInt());
+  analogWrite(verde2,colors[1][1].toInt());
+  analogWrite(vermelho2, colors[1][2].toInt());
+  analogWrite(azul3, colors[2][0].toInt());
+  analogWrite(verde3,colors[2][1].toInt());
+  analogWrite(vermelho3, colors[2][2].toInt()); 
+  analogWrite(azul4, colors[3][0].toInt());
+  analogWrite(verde4,colors[3][1].toInt());
+  analogWrite(vermelho4, colors[3][2].toInt());
 }
 
 void initializeESP8266()
@@ -181,19 +186,18 @@ void serverSetup()
 }
 
 void serverDemo()
-{
+{ 
   // available() is an ESP8266Server function which will
   // return an ESP8266Client object for printing and reading.
   // available() has one parameter -- a timeout value. This
   // is the number of milliseconds the function waits,
   // checking for a connection.
   ESP8266Client client = server.available(500);
+  String json = "";
   
  if (client) {
   // if you get a client,
-    
    
-    
     Serial.println("new client");           // print a message out the serial port
     while (client.connected()) {            // loop while the client's connected
       if (client.available()) {              // if there's bytes to read from the client,
@@ -202,45 +206,69 @@ void serverDemo()
         Serial.println(request);
         
         
-      int aux1 = request.indexOf('{');
+      /*int aux1 = request.indexOf('{');
       int aux2 = request.indexOf('}');
       json = request.substring(aux1,aux2+1);
-      Serial.println(json);
+      Serial.println("json");
+      Serial.println(json);*/
+      //delay(1000);
+     // ---------Array de cores ---------
+    //json.replace("{", "");
+    //json.replace("}", "");
+    
+    String array = request.substring(request.indexOf("[[")+1,request.indexOf("]]") +1);
+    int x = 0;
+    int y = 0;
+    Serial.println("array");
+    Serial.println(array);
 
-     
-      //Serial.println("{\"sensor\":\"gps\",\"time\":1351824120,\"data\":[48.756080,2.302038]}");
-       //DeserializationError error = deserializeJson(doc, json1);
-      //{"ColorSetup":[[0,0,255],[255,0,0]],"Effect":324}
-    /*
-      JsonObject obj = doc.as<JsonObject>();
-      long effect = obj["Effect"];
-      Serial.println(effect);
-    */
-        // Check to see if the client request was "GET /H" or "GET /L":
-        if (request.indexOf("GET /H") >= 0) {
-          digitalWrite(13, HIGH); // GET /H turns the LED on
-          Serial.println("ledON");
-        }
-        if (request.indexOf("GET /L") >= 0) {
-          
-          digitalWrite(13, LOW);                // GET /L turns the LED off
-          Serial.println("ledOFF");
-        }
-      }
+    for (int i = 0; i < 4 ; i++){
+       for (int j = 0; j < 3; j++){
+        colors[i][j]="";
+      } 
     }
-    for(int i=0;i < json.length() ;i++){
-      Serial.println(json[i]);
-      if(json[i] == '}'){
-        Serial.println("entrou aqui121212");
-        StaticJsonDocument<200> doc;
-          delay(2000);
-      deserializeJson(doc, json);
-      JsonObject obj = doc.as<JsonObject>();
-      long effect = obj["Effect"];
-      Serial.println(effect);
-      }
+    
+    for (int i = 0; i < array.length(); i++){
+      
+        if(array[i]!='[' && array[i]!=']' && array[i]!=','){
+            colors[x][y] = colors[x][y] + array[i];
+        }
+        if(array[i] == ','){
+            y=y+1;
+        }
+        if(i>0 & array[i]=='['){
+            x=x+1;
+            y=0;
+        }
     }
-    //deserelize();
+    for (int i = 0; i < 4 ; i++){
+    Serial.println("ARRAY:");
+       for (int j = 0; j < 3; j++){
+        Serial.println(colors[i][j]);
+      } 
+    }
+  /**/
+    //-------------Effect---------------
+   /* 
+    for(int i = json.indexOf("\"Effect\":\"")+10; i < json.length(); i++){
+        if(json[i]!='"'){
+            effect = effect + json[i];
+        }else{
+            break;
+        }   
+    }
+    //-------------Token---------------
+    for(int i = json.indexOf("\"Token\":\"")+9; i < json.length(); i++){
+        if(json[i]!='"'){
+            token = token + json[i];
+        }else{
+            break;
+        }   
+    }*/
+      }
+    
+    }
+    
     // close the connection:
     client.stop();
     Serial.println("client disonnected");
