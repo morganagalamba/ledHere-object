@@ -8,9 +8,9 @@ const int verde1 = 12;
 const int vermelho1 = 11;
 
 
-const int azul2 = A0;
-const int verde2 = A1;
-const int vermelho2 = A2;
+const int azul2 = A5;
+const int verde2 = A4;
+const int vermelho2 = A3;
 
 const int azul3 = 7;
 const int verde3 = 6;
@@ -58,7 +58,7 @@ void setup()
   // debug information.
   Serial.begin(9600);
    pinMode(13, OUTPUT); 
-  serialTrigger(F("Press any key to begin."));
+//  serialTrigger(F("Press any key to begin."));
 
   // initializeESP8266() verifies communication with the WiFi
   // shield, and sets it up.
@@ -69,9 +69,9 @@ void setup()
 
   // displayConnectInfo prints the Shield's local IP
   // and the network it's connected to.
-  displayConnectInfo();
+  //displayConnectInfo();
   
-  serialTrigger(F("Press any key to test server."));
+ // serialTrigger(F("Press any key to test server."));
   serverSetup();
 }
 
@@ -181,6 +181,19 @@ void serverSetup()
   // constructor (in global area)
   server.begin();
   Serial.print(F("Server started! Go to "));
+   analogWrite(azul1,0);
+  analogWrite(verde1,255);
+  analogWrite(vermelho1, 0); 
+ analogWrite(azul2, 0);
+  analogWrite(verde2,255);
+  analogWrite(vermelho2, 0);
+  analogWrite(azul3, 0);
+  analogWrite(verde3,255);
+  analogWrite(vermelho3, 0); 
+  analogWrite(azul4, 0);
+  analogWrite(verde4,255);
+  analogWrite(vermelho4, 0);
+  delay(2000);
   Serial.println(esp8266.localIP());
   Serial.println();
 }
